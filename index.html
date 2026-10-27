@@ -35,7 +35,6 @@ header b{flex:1}.ic{width:36px;height:36px;border-radius:50%;background:#46585a;
 .drawer .inner{max-width:34rem;margin:0 auto}.hidden{display:none}
 .row{display:block;width:100%;text-align:left;margin:.6rem 0}
 .bal{font:1.7rem/1.5 ui-monospace,Menlo,Consolas,monospace}.err{color:var(--err);min-height:1.6rem}
-.dev{font-size:.78rem;word-break:break-all;color:var(--muted);margin-top:2rem}.dev a{color:var(--mine)}
 @media (prefers-reduced-motion:no-preference){.m{animation:in .3s ease-out}@keyframes in{from{opacity:0}}}
 </style>
 </head>
@@ -61,14 +60,12 @@ e4:[A("確認ができた。今回はこれで終わりだ。"),P(110000)]
 };
 /* ============ 状態 ============ */
 const KEY="courier-arg-v2";
-if(location.hash==="#dev"&&new URLSearchParams(location.search).get("reset")){try{localStorage.removeItem(KEY);}catch(e){}history.replaceState(null,"",location.pathname+"#dev");}
 let S={};try{S=JSON.parse(localStorage.getItem(KEY))||{};}catch(e){}
 const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}};
 const $=s=>document.querySelector(s),sleep=ms=>new Promise(r=>setTimeout(r,ms));
 const RM=matchMedia("(prefers-reduced-motion: reduce)").matches;
 const num=n=>n.toLocaleString("ja-JP");
-const devLinks=()=>location.hash==="#dev"?`<div class="dev">開発用:<br>`+[["start",START]].concat(TAGS.map((t,i)=>["t"+(i+1),t])).map(x=>`<a href="?t=${x[1]}#dev">${x[0]}</a>`).join(" / ")+` / <a href="?reset=1#dev">リセット</a></div>`:"";
-function page(h,nofoot){document.body.className="";document.body.innerHTML=`<main>${h}${nofoot?"":"<footer>このゲームはフィクションです</footer>"}${devLinks()}</main>`;}
+function page(h,nofoot){document.body.className="";document.body.innerHTML=`<main>${h}${nofoot?"":"<footer>このゲームはフィクションです</footer>"}</main>`;}
 
 /* ============ 導入 ============ */
 function offer(){page(`<h1 class="big">データを運ぶだけの簡単なお仕事で報酬ゲット!</h1><div class="btns"><button id="y">引き受ける</button><button class="ghost" id="n">引き受けない</button></div>`);
@@ -104,7 +101,7 @@ function bindMenu(){const mb=$("#mb"),dr=$("#dr"),box=$("#dri");
   const open=h=>{box.innerHTML=h;dr.classList.remove("hidden");mb.setAttribute("aria-expanded","true");mb.textContent="×";};
   const close=()=>{dr.classList.add("hidden");mb.setAttribute("aria-expanded","false");mb.textContent="☰";};
   const bk='<button class="ghost row" id="bk">メニューに戻る</button>';
-  const top=()=>{open(`<h1>メニュー</h1><button class="ghost row" id="m1">ポイントを確認</button><button class="ghost row" id="m2">ポイントを交換</button><button class="ghost row" id="m3">ダウンロードしたデータ</button><button class="ghost row" id="m0">チャットに戻る</button><button class="ghost row small" id="m4">ゲームをやめる</button>${devLinks()}`);
+  const top=()=>{open(`<h1>メニュー</h1><button class="ghost row" id="m1">ポイントを確認</button><button class="ghost row" id="m2">ポイントを交換</button><button class="ghost row" id="m3">ダウンロードしたデータ</button><button class="ghost row" id="m0">チャットに戻る</button><button class="ghost row small" id="m4">ゲームをやめる</button>`);
     $("#m1").onclick=pts;$("#m2").onclick=exch;$("#m3").onclick=files;$("#m0").onclick=close;$("#m4").onclick=()=>{S={ended:true};save();finish();};};
   const pts=()=>{open(`<h1>ポイントを確認</h1><div class="bal">${num(S.pay)} pt</div><p class="small">ギフトカード等と交換できます。</p>${bk}`);$("#bk").onclick=top;};
   const exch=()=>{open(`<h1>ポイントを交換</h1><p>現在: ${num(S.pay)} pt<br>1ポイント = 1円分</p><label for="amt">交換するポイント数</label><input id="amt" inputmode="numeric" autocomplete="off"><button id="ex">交換する</button><p id="res" class="err" role="status"></p>${bk}`);
