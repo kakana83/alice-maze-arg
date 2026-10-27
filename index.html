@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<title>受け渡し</title>
+<style>
+:root{--bg:#1a2224;--panel:#2a3639;--line:#34423f;--text:#dde5e1;--muted:#8b9a97;--mine:#c5d3a6;--err:#e0645a}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--text);font:16px/1.7 "Hiragino Sans","Yu Gothic UI","Meiryo",sans-serif}
+main{max-width:34rem;margin:0 auto;padding:3rem 1.25rem}
+h1{font-size:1.15rem;margin:1.2rem 0}h1.big{font-size:1.5rem;line-height:1.6;margin:3rem 0 2rem}
+p{margin:.8rem 0}.small,footer{color:var(--muted);font-size:.8rem}footer{margin-top:3rem}
+button{font:inherit;background:var(--mine);color:#18201a;border:0;padding:.65rem 1.1rem;border-radius:.4rem;cursor:pointer;min-height:44px}
+button.ghost{background:none;color:var(--text);border:1px solid var(--line)}
+button:focus-visible,input:focus-visible{outline:2px solid var(--text);outline-offset:2px}
+.btns{display:flex;gap:.75rem;flex-wrap:wrap}.btns button{flex:1 1 9rem}
+input{font:inherit;width:100%;padding:.7rem;background:var(--bg);color:var(--text);border:1px solid var(--line);border-radius:.4rem;min-height:44px;margin:.5rem 0}
+body.chat{display:flex;flex-direction:column;height:100dvh;max-width:34rem;margin:0 auto}
+header{position:relative;z-index:10;display:flex;align-items:center;gap:.7rem;padding:calc(.6rem + env(safe-area-inset-top)) .9rem .6rem;border-bottom:1px solid var(--line);background:var(--panel)}
+header b{flex:1}.ic{width:36px;height:36px;border-radius:50%;background:#46585a;display:grid;place-items:center;font-size:.9rem}
+#mb{width:44px;padding:0;font-size:1.4rem;background:none;color:var(--text)}
+#msgs{flex:1;overflow-y:auto;padding:1rem .9rem;display:flex;flex-direction:column;gap:.55rem}
+.m{max-width:78%;padding:.5rem .8rem;border-radius:1rem;white-space:pre-line;overflow-wrap:anywhere}
+.m.a{align-self:flex-start;background:var(--panel);border-top-left-radius:.2rem}
+.m.u{align-self:flex-end;background:var(--mine);color:#18201a;border-top-right-radius:.2rem}
+.m.s{align-self:center;max-width:90%;text-align:center;border:1px solid var(--line);border-radius:.6rem;font:.85rem/1.6 ui-monospace,Menlo,Consolas,monospace}
+.m.d{align-self:center;background:none;color:var(--muted);font-size:.8rem;font-style:italic}
+.m.l{align-self:center;background:none;color:var(--mine);border:1px solid var(--mine);border-radius:.6rem;font:inherit;cursor:pointer;min-height:44px}
+.typ{letter-spacing:.2em;color:var(--muted)}
+#ch{display:flex;flex-direction:column;align-items:flex-end;gap:.5rem;padding:.7rem .9rem calc(.9rem + env(safe-area-inset-bottom));min-height:5.5rem;border-top:1px solid var(--line)}
+#ch button{background:none;color:var(--mine);border:1px solid var(--mine);border-radius:.8rem;max-width:85%;text-align:left}
+.drawer{position:fixed;inset:0;background:rgba(14,19,20,.97);z-index:9;padding:4.5rem 1.25rem 2rem;overflow:auto}
+.drawer .inner{max-width:34rem;margin:0 auto}.hidden{display:none}
+.row{display:block;width:100%;text-align:left;margin:.6rem 0}
+.bal{font:1.7rem/1.5 ui-monospace,Menlo,Consolas,monospace}.err{color:var(--err);min-height:1.6rem}
+.dev{font-size:.78rem;word-break:break-all;color:var(--muted);margin-top:2rem}.dev a{color:var(--mine)}
+@media (prefers-reduced-motion:no-preference){.m{animation:in .3s ease-out}@keyframes in{from{opacity:0}}}
+</style>
+</head>
+<body>
+<script>
+/* ============ 設定 ============ */
+const CLIENT="依頼主";
+const START="Alice_maze_s_sd5dv8";                                  // 導入タグ
+const TAGS=["Alice_maze_1_q3f6ai","Alice_maze_2_0md32o","Alice_maze_3_9aep9i","Alice_maze_4_cg3b4f"]; // 各依頼の完了+次の依頼開始タグ(D館1F, C館屋上, E館1F, F館)
+const GAP=9000;                                              // 完了→次の依頼開始までの間(ms)
+const DEL="このメッセージは削除されました";
+/* ---- シナリオ(A=依頼主 U=自分(選択肢) F=データ受信 P=振込) ---- */
+const A=t=>["a",t],U=(...o)=>["u",o],F=n=>["f",n],P=n=>["p",n];
+const SC={
+s1:[A("...君が新しいバイト君かな。"),U("はい。"),A("それじゃあ早速仕事の説明をしよう。"),A("最初にもあったように、本当に簡単なものだ。"),A("君にはいくつかのデータを指定の場所に運んでもらう、ただそれだけだ。"),F("HDgzpqLaMAAB254.jpg"),A("まずはこのデータをD館1階の人目につかないところまで運んでもらおう。"),U("場所がわからない"),A("場所がわからない？大丈夫だ。所定の場所にQRコードが置いてある。"),A("そのQRコードを読み取ってくれれば仕事は終わりだ。"),A("それじゃあなるべく早く取り組んでくれ。Time is Moneyだ。")],
+e1:[A("先方からも受け取りが完了したとの連絡があった。"),A("...バイト代を振り込んだ。確認してくれ。"),P(15000)],
+s2:[A("それじゃあ次だ。"),F("ac41B3dda9A8f.zip"),A("次はC館屋上だ。あそこなら人も少ない。"),A("そういえば言ってなかったが、データの中身は見るなよ。"),A("パスワードが必要だから見れないとは思うが、万が一見れたなら..."),A("まあ君なら大丈夫だろう。"),A("さあ、早く取り組んでくれ。Time is Moneyだ。")],
+e2:[A("受け取りの確認が届いたよ。これで仕事は完了だ。"),P(40000),A("遠くから見ていたが、しっかりと働いてくれたようだね。何よりだ。"),U("見ていたんですか？"),A("勿論さ。まあこれはテストみたいなものだよ。君が上手く働くかどうかのね。")],
+s3:[A("次の依頼だ。"),["u",["はい","もうやめたいです。"],{1:[A("もうやめたい？何を言っている。"),A("忘れたのかい。私は君を見ているんだよ。"),A("君の顔や特徴なんかは覚えられている。もう逃げられないんだよ。"),A("次の依頼だ。"),U("はい")]}],A("それじゃあ行こうか。"),A("次はこのデータをE館の1階にだ。"),F("b388550190a5e3ea304f44E.mp4"),A("人は多いが大丈夫だ。君はただQRコードを読み込むだけ。ただそれだけだ。"),A("さあ、早く取り組んでくれ。Time is Moneyだ。")],
+e3:[A("今回もうまくやってくれたようだな。これで依頼は完了だ。"),P(80000),A("さあ次へ行こう。")],
+s4:[A("これで最後だ"),U("はい","わかりました。"),A("これをF館まで運んでくれ。あとはもう...分るよな。"),F("S3974DczW26lA74vF0.wav")],
+e4:[A("確認ができた。今回はこれで終わりだ。"),P(110000)]
+};
+/* ============ 状態 ============ */
+const KEY="courier-arg-v2";
+if(location.hash==="#dev"&&new URLSearchParams(location.search).get("reset")){try{localStorage.removeItem(KEY);}catch(e){}history.replaceState(null,"",location.pathname+"#dev");}
+let S={};try{S=JSON.parse(localStorage.getItem(KEY))||{};}catch(e){}
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}};
+const $=s=>document.querySelector(s),sleep=ms=>new Promise(r=>setTimeout(r,ms));
+const RM=matchMedia("(prefers-reduced-motion: reduce)").matches;
+const num=n=>n.toLocaleString("ja-JP");
+const devLinks=()=>location.hash==="#dev"?`<div class="dev">開発用:<br>`+[["start",START]].concat(TAGS.map((t,i)=>["t"+(i+1),t])).map(x=>`<a href="?t=${x[1]}#dev">${x[0]}</a>`).join(" / ")+` / <a href="?reset=1#dev">リセット</a></div>`:"";
+function page(h,nofoot){document.body.className="";document.body.innerHTML=`<main>${h}${nofoot?"":"<footer>このゲームはフィクションです</footer>"}${devLinks()}</main>`;}
+
+/* ============ 導入 ============ */
+function offer(){page(`<h1 class="big">データを運ぶだけの簡単なお仕事で報酬ゲット!</h1><div class="btns"><button id="y">引き受ける</button><button class="ghost" id="n">引き受けない</button></div>`);
+  $("#y").onclick=()=>{S={started:true,tag:0,pay:0,files:[],log:[],q:[],ex:false};push(SC.s1);save();chat();};
+  $("#n").onclick=()=>{try{window.close();}catch(e){}document.body.innerHTML='<main><p>ブラウザを閉じてください。</p></main>';setTimeout(()=>location.replace("about:blank"),500);};}
+function push(evs){evs.forEach(e=>{if(e[0]==="f")S.files.push(e[1]);if(e[0]==="p")S.pay+=e[1];});S.q.push(...evs);} /* データとptはタグ読取時点で確定 */
+
+/* ============ チャット ============ */
+function chat(){document.body.className="chat";
+  document.body.innerHTML=`<header><span class="ic">匿</span><b>${CLIENT}</b><button id="mb" aria-label="メニュー" aria-expanded="false">☰</button></header><div id="msgs"></div><div id="ch"></div><div class="drawer hidden" id="dr"><div class="inner" id="dri"></div></div>`;
+  S.log.forEach(l=>draw(l));end(true);bindMenu();play();}
+function draw(l){if(l[0]==="l"){const b=document.createElement("button");b.className="m l";b.textContent=l[1];b.onclick=()=>window.openEx&&window.openEx();$("#msgs").appendChild(b);return b;}const d=document.createElement("div");d.className="m "+l[0];d.textContent=l[0]==="d"?DEL:l[1];$("#msgs").appendChild(d);return d;}
+function end(now){const m=$("#msgs");m.scrollTo({top:m.scrollHeight,behavior:now||RM?"auto":"smooth"});}
+function addLog(l){S.log.push(l);draw(l);end();}
+function choose(opts){return new Promise(res=>{const c=$("#ch");c.innerHTML="";opts.forEach((o,i)=>{const b=document.createElement("button");b.textContent=o;b.onclick=()=>{c.innerHTML="";res(i);};c.appendChild(b);});});}
+async function typing(t){const d=document.createElement("div");d.className="m a typ";d.textContent="・・・";$("#msgs").appendChild(d);end();await sleep(Math.min(2600,700+t.length*50));d.remove();}
+let busy=false;
+async function play(){if(busy)return;busy=true;
+  while(S.q.length){const e=S.q[0];
+    if(e[0]==="w")await sleep(e[1]);
+    else if(e[0]==="a"){await typing(e[1]);addLog(["a",e[1]]);await sleep(450);}
+    else if(e[0]==="u"){const i=await choose(e[1]);addLog(["u",e[1][i]]);if(e[2]&&e[2][i])S.q.splice(1,0,...e[2][i]);await sleep(500);}
+    else if(e[0]==="f"||e[0]==="p"){await sleep(1000);addLog(["s",e[0]==="f"?"データが送信されました\n"+e[1]:"user192760 様より\n"+e[1]+"ptが振り込まれました。"]);await sleep(600);}
+    else if(e[0]==="x"){await sleep(3500);const els=[...$("#msgs").children];
+      for(let i=0;i<els.length;i++){els[i].className="m d";els[i].textContent=DEL;S.log[i]=["d"];save();await sleep(260);}}
+    else if(e[0]==="q"){for(;;){await choose(["退出する"]);if(S.ex)break;{const L=S.log[S.log.length-1];if(!L||L[0]!=="l")addLog(["l","ポイント交換画面へ移動してください。"]);else end();}save();}
+      S={ended:true};save();finish();busy=false;return;}
+    S.q.shift();save();}
+  busy=false;}
+
+/* ============ メニュー ============ */
+function bindMenu(){const mb=$("#mb"),dr=$("#dr"),box=$("#dri");
+  const open=h=>{box.innerHTML=h;dr.classList.remove("hidden");mb.setAttribute("aria-expanded","true");mb.textContent="×";};
+  const close=()=>{dr.classList.add("hidden");mb.setAttribute("aria-expanded","false");mb.textContent="☰";};
+  const bk='<button class="ghost row" id="bk">メニューに戻る</button>';
+  const top=()=>{open(`<h1>メニュー</h1><button class="ghost row" id="m1">ポイントを確認</button><button class="ghost row" id="m2">ポイントを交換</button><button class="ghost row" id="m3">ダウンロードしたデータ</button><button class="ghost row" id="m0">チャットに戻る</button><button class="ghost row small" id="m4">ゲームをやめる</button>${devLinks()}`);
+    $("#m1").onclick=pts;$("#m2").onclick=exch;$("#m3").onclick=files;$("#m0").onclick=close;$("#m4").onclick=()=>{S={ended:true};save();finish();};};
+  const pts=()=>{open(`<h1>ポイントを確認</h1><div class="bal">${num(S.pay)} pt</div><p class="small">ギフトカード等と交換できます。</p>${bk}`);$("#bk").onclick=top;};
+  const exch=()=>{open(`<h1>ポイントを交換</h1><p>現在: ${num(S.pay)} pt<br>1ポイント = 1円分</p><label for="amt">交換するポイント数</label><input id="amt" inputmode="numeric" autocomplete="off"><button id="ex">交換する</button><p id="res" class="err" role="status"></p>${bk}`);
+    $("#ex").onclick=()=>{if(S.tag>=TAGS.length){S.ex=true;save();}$("#res").textContent="250000円から交換可能です";};$("#bk").onclick=top;};
+  const files=()=>{open(`<h1>ダウンロードしたデータ</h1>`+(S.files.length?S.files.map((f,i)=>`<button class="ghost row" data-i="${i}" style="font-family:ui-monospace,Menlo,monospace">${f}</button>`).join(""):'<p class="small">データはありません。</p>')+bk);
+    box.querySelectorAll("[data-i]").forEach(b=>b.onclick=()=>pass(S.files[b.dataset.i]));$("#bk").onclick=top;};
+  const pass=f=>{open(`<h1>パスコードを入力してください</h1><p class="small">${f}</p><input id="pw" type="password" autocomplete="off"><button id="go">開く</button><p class="err" id="res" role="alert"></p><button class="ghost row" id="bk">戻る</button>`);
+    $("#go").onclick=()=>{$("#res").textContent="パスコードが違います";};$("#bk").onclick=files;};
+  window.openEx=exch;
+  mb.onclick=()=>dr.classList.contains("hidden")?top():close();}
+
+/* ============ 終了画面 ============ */
+function finish(){page(`<h1>最後まで遊んでいただきありがとうございました。</h1>
+<p>このゲームはフィクションです。実在する人物や事例などとは一切関係がありません。</p>
+<p>またこの体験は、現実の「闇バイト」の手口を題材にした創作です。実際の募集では、高額報酬や「簡単」「誰でもできる」といった言葉で誘い、個人情報を渡させたあと、それを理由に脅して抜けられなくする手口が報告されています。報酬が支払われる保証もありません。</p>
+<p>少しでも不安を感じたら、一人で抱えず、すぐに警察や学生相談窓口へ相談してください。</p>
+<p>もし面白いと思った場合はXやInstagramにて<br>#Alice_maze大楠祭<br>で感想をいただけると幸いです。</p>
+<p>Alice_maze公式Twitter:@Alice_maze</p>`,true);}
+
+/* ============ ルーティング ============ */
+function route(t){
+  if(S.ended)return finish();
+  if(!t)return S.started?chat():page("<h1>タグを探してください</h1>");
+  if(t===START)return S.started?chat():offer();
+  const i=TAGS.indexOf(t);
+  if(i<0)return page("<h1>このタグは無効です</h1>");
+  if(!S.started)return page("<h1>タグを探してください</h1>");
+  if(i===S.tag){S.tag++;
+    push(i<3?[...SC["e"+(i+1)],["w",GAP],...SC["s"+(i+2)]]:[...SC.e4,["x"],["q"]]);save();}
+  chat();}
+const t=new URLSearchParams(location.search).get("t");
+if(t)history.replaceState(null,"",location.pathname+location.hash);
+route(t);
+</script>
+</body>
+</html>
